@@ -27,7 +27,7 @@ def create_app(settings_module):
     app.config.from_object(settings_module)
     app.config["JWT_SECRET_KEY"] = "1a2v"
     CORS(app, resources={r"/api/*": {
-    "origins": "http://localhost:5173",
+    "origins": app.config.get('CORS_ORIGINS', 'http://localhost:5173'),
     "methods": ["GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"],
     "allow_headers": ["Content-Type", "Authorization"]
     }})
