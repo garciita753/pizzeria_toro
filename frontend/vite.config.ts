@@ -17,4 +17,10 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  preview: {
+    allowedHosts: [
+      'balanced-contentment-production-b0f7.up.railway.app',
+      'localhost',
+    ],
+  },
 })
