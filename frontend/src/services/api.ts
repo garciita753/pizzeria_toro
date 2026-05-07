@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-const baseURL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000/';
+const baseURL = (import.meta as any).env?.VITE_API_URL || 'https://pizzeriatoro-production.up.railway.app'
 
 const api = axios.create({
 	baseURL,
