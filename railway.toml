@@ -1,7 +1,5 @@
 [build]
-root = "backend"
-command = "pip install -r requirements.txt"
+buildCommand = "pip install -r requirements.txt"
 
 [deploy]
-root = "backend"
-command = "python entrypoint.py"
+startCommand = "python entrypoint.py"
