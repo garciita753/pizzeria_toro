@@ -6,7 +6,7 @@ load_dotenv()
 
 from app import create_app
 
-settings_module = os.getenv('APP_SETTINGS_MODULE')
+settings_module = os.getenv('APP_SETTINGS_MODULE', 'config.default')
 app = create_app(settings_module)
 
 if __name__ == '__main__':
