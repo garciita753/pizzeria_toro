@@ -18,6 +18,7 @@ export default defineConfig({
     },
   },
   preview: {
+    host: '0.0.0.0',
     allowedHosts: [
       'balanced-contentment-production-b0f7.up.railway.app',
       'localhost',
