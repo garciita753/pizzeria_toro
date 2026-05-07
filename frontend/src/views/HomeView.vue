@@ -28,7 +28,7 @@
 
     <div class="hero">
       <h1>BIENVENIDOS <span>AL EQUIPO</span></h1>
-      <p>Plataforma digital exclusiva para los colaboradores de Pizzería El Torazo. 
+      <p>Plataforma digital exclusiva para los empleados de Pizzería El Torazo. 
          Accede a todas las herramientas y recursos que necesitas para tu desarrollo laboral.</p>
     </div>
 
@@ -36,41 +36,6 @@
     <div class="separator">
       <div class="separator-line"></div>
     </div>
-
-
-    <div class="info-section">
-      <div v-for="card in infoCards" :key="card.id" class="info-card">
-        <i :class="card.icon"></i>
-        <h3>{{ card.title }}</h3>
-        <p>{{ card.description }}</p>
-      </div>
-    </div>
-
-
-    <div class="stats-section">
-      <div v-for="stat in stats" :key="stat.id" class="stat-item">
-        <div class="stat-number">{{ stat.number }}</div>
-        <div class="stat-label">{{ stat.label }}</div>
-      </div>
-    </div>
-
-
-    <div class="cta-section">
-      <div class="cta-content">
-        <h2 class="cta-title">
-          ¿YA ERES PARTE DE <span>EL TORAZO</span>?
-        </h2>
-        <p class="cta-text">
-          Accede a tu cuenta para gestionar tus turnos, consultar nóminas y mantenerte al día con los comunicados internos.
-        </p>
-        <div class="cta-buttons">
-          <button class="cta-btn login" @click="emit('showLogin', 'login')">
-            <i class="fas fa-sign-in-alt"></i> INICIAR SESIÓN
-          </button>
-        </div>
-      </div>
-    </div>
-
 
     <div class="footer">
       <div class="footer-logo">
@@ -107,47 +72,6 @@ interface Stat {
 const emit = defineEmits<{
   (e: 'showLogin', tab: 'login'): void;
 }>();
-
-
-const infoCards = computed<InfoCard[]>(() => [
-  {
-    id: 1,
-    icon: 'fas fa-user-tie',
-    title: 'ACCESO PRIVADO',
-    description: 'Sistema exclusivo para colaboradores de Pizzería El Torazo. Clientes, diríjanse a nuestro local.'
-  },
-  {
-    id: 2,
-    icon: 'fas fa-calendar-alt',
-    title: 'GESTIÓN DE TURNOS',
-    description: 'Consulta y organiza tus horarios de trabajo. Solicita cambios y visualiza tu calendario mensual.'
-  },
-  {
-    id: 3,
-    icon: 'fas fa-file-invoice',
-    title: 'NÓMINAS Y BENEFICIOS',
-    description: 'Accede a tus recibos de nómina, prestaciones y beneficios exclusivos para empleados.'
-  },
-  {
-    id: 4,
-    icon: 'fas fa-chart-line',
-    title: 'RENDIMIENTO',
-    description: 'Visualiza tus métricas de desempeño, objetivos alcanzados y áreas de oportunidad.'
-  },
-  {
-    id: 5,
-    icon: 'fas fa-comments',
-    title: 'COMUNICADOS',
-    description: 'Mantente informado de noticias, eventos y anuncios importantes de la empresa.'
-  },
-  {
-    id: 6,
-    icon: 'fas fa-headset',
-    title: 'SOPORTE RH',
-    description: '¿Problemas con tu acceso? Contacta inmediatamente a Recursos Humanos.'
-  }
-]);
-
 
 const stats = computed<Stat[]>(() => [
   { id: 1, number: '150+', label: 'EMPLEADOS' },

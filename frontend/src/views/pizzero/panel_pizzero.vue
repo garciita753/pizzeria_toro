@@ -500,6 +500,7 @@ onUnmounted(() => {
 }
 
 
+/* ── Header ─────────────────────────────────────────────── */
 .header {
   display: flex; justify-content: space-between;
   align-items: center; margin-bottom: 30px;
@@ -511,39 +512,40 @@ onUnmounted(() => {
 .logo {
   font-size: 32px; font-weight: 800; color: #ffffff;
   text-transform: uppercase; letter-spacing: 2px;
-  text-shadow: 2px 2px 0 #e08000, 4px 4px 0 rgba(0,0,0,0.5);
+  text-shadow: 2px 2px 0 #ff0000, 4px 4px 0 rgba(0,0,0,0.5);
 }
 .logo span {
-  color: #e08000;
+  color: #ff0000;
   text-shadow: 2px 2px 0 #ffffff, 4px 4px 0 rgba(0,0,0,0.5);
 }
 
 .user-info {
   background: #111111; padding: 10px 25px;
-  border-radius: 12px; border: 1px solid #e08000;
+  border-radius: 12px; border: 1px solid #ff0000;
   display: flex; align-items: center; gap: 15px;
 }
-.user-info i { color: #e08000; font-size: 20px; }
+.user-info i { color: #ff0000; font-size: 20px; }
 .user-name   { font-weight: 700; color: #ffffff; }
-.user-role   { font-size: 12px; color: #e08000; text-transform: uppercase; }
+.user-role   { font-size: 12px; color: #ff0000; text-transform: uppercase; }
 
 .logout-btn {
-  background: transparent; border: 2px solid #e08000;
+  background: transparent; border: 2px solid #ff0000;
   color: #ffffff; padding: 10px 20px; border-radius: 12px;
   cursor: pointer; font-weight: 600; transition: all 0.3s;
 }
-.logout-btn:hover { background: #e08000; color: #000000; }
+.logout-btn:hover { background: #ff0000; color: #ffffff; }
 
 
+/* ── Panel ───────────────────────────────────────────────── */
 .pos-panel {
-  background: #ffffff; border-radius: 15px;
-  box-shadow: 0 20px 40px rgba(224,128,0,0.2);
-  border: 1px solid #e08000; overflow: hidden; margin-bottom: 30px;
+  background: #ffffff; border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(255,0,0,0.2);
+  border: 1px solid #ff0000; overflow: hidden; margin-bottom: 30px;
 }
 
 .pos-header {
   background: #000000; padding: 15px 25px;
-  border-bottom: 3px solid #e08000;
+  border-bottom: 3px solid #ff0000;
   display: flex; justify-content: space-between;
   align-items: center; flex-wrap: wrap; gap: 15px;
 }
@@ -552,7 +554,7 @@ onUnmounted(() => {
   color: #ffffff; font-size: 24px; font-weight: 700;
   text-transform: uppercase; display: flex; align-items: center; gap: 10px;
 }
-.pos-header h2 i { color: #e08000; }
+.pos-header h2 i { color: #ff0000; }
 
 .header-stats { display: flex; gap: 20px; flex-wrap: wrap; }
 
@@ -561,18 +563,19 @@ onUnmounted(() => {
   background: #1a1a1a; padding: 8px 18px;
   border-radius: 12px; border: 1px solid #333;
 }
-.stat-item i      { color: #e08000; font-size: 16px; }
+.stat-item i      { color: #ff0000; font-size: 16px; }
 .stat-value       { font-size: 20px; font-weight: 800; color: #ffffff; }
 .stat-label       { font-size: 11px; color: #999; text-transform: uppercase; }
 
-.turno-badge               { border-color: #e08000 !important; }
-.turno-badge i             { color: #e08000; }
-.turno-badge .stat-value   { color: #e08000; }
+.turno-badge               { border-color: #ff0000 !important; }
+.turno-badge i             { color: #ff0000; }
+.turno-badge .stat-value   { color: #ff0000; }
 .sin-turno i               { color: #ffc107 !important; }
 
 .date-time { color: #cccccc; font-size: 14px; font-weight: 500; }
 
 
+/* ── Sin turno ───────────────────────────────────────────── */
 .sin-turno-state {
   text-align: center; padding: 60px 20px;
   color: #ffc107; background: #f5f5f5;
@@ -581,6 +584,7 @@ onUnmounted(() => {
 .sin-turno-state p { font-size: 16px; color: #555; }
 
 
+/* ── Content ─────────────────────────────────────────────── */
 .pos-content { padding: 25px; background: #f5f5f5; }
 
 .filters-row {
@@ -597,7 +601,7 @@ onUnmounted(() => {
   text-transform: uppercase; letter-spacing: 0.5px;
 }
 .category-tab.active,
-.category-tab:hover { background: #e08000; }
+.category-tab:hover { background: #ff0000; }
 
 .search-box {
   position: relative; flex: 1;
@@ -605,7 +609,7 @@ onUnmounted(() => {
 }
 .search-box i {
   position: absolute; left: 14px; top: 50%;
-  transform: translateY(-50%); color: #e08000; font-size: 14px;
+  transform: translateY(-50%); color: #ff0000; font-size: 14px;
 }
 .search-box input {
   width: 100%; padding: 10px 18px 10px 40px;
@@ -613,20 +617,21 @@ onUnmounted(() => {
   border-radius: 12px; color: #000; font-size: 14px;
   outline: none; transition: all 0.3s;
 }
-.search-box input:focus { border-color: #e08000; }
+.search-box input:focus { border-color: #ff0000; }
 
 .refresh-btn {
-  background: #000; color: #e08000; border: none;
+  background: #000; color: #ff0000; border: none;
   width: 40px; height: 40px; border-radius: 12px;
   cursor: pointer; font-size: 16px; transition: all 0.3s;
   display: flex; align-items: center; justify-content: center;
 }
-.refresh-btn:hover:not(:disabled) { background: #e08000; color: #fff; }
+.refresh-btn:hover:not(:disabled) { background: #ff0000; color: #fff; }
 .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .product-count { color: #666; font-size: 14px; font-weight: 600; white-space: nowrap; }
 
 
+/* ── Estados vacíos / carga ──────────────────────────────── */
 .loading-state,
 .empty-state {
   text-align: center; padding: 60px 20px; color: #999;
@@ -636,11 +641,12 @@ onUnmounted(() => {
   font-size: 60px; color: #e0e0e0;
   margin-bottom: 16px; display: block;
 }
-.loading-state i { color: #e08000; }
+.loading-state i { color: #ff0000; }
 .loading-state p,
 .empty-state p   { font-size: 16px; }
 
 
+/* ── Grid de pedidos ─────────────────────────────────────── */
 .pedidos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -648,18 +654,19 @@ onUnmounted(() => {
 }
 
 
+/* ── Card ────────────────────────────────────────────────── */
 .pedido-card {
   background: #ffffff; border: 2px solid #e0e0e0;
   border-radius: 12px; overflow: hidden;
   transition: all 0.3s; position: relative;
 }
 .pedido-card:hover {
-  border-color: #e08000; transform: translateY(-4px);
-  box-shadow: 0 10px 24px rgba(224,128,0,0.18);
+  border-color: #ff0000; transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(255,0,0,0.18);
 }
 .pedido-card::before {
   content: ''; position: absolute; top: 0; left: 0;
-  width: 100%; height: 4px; background: #e08000;
+  width: 100%; height: 4px; background: #ff0000;
   transform: scaleX(0); transition: transform 0.3s;
 }
 .pedido-card:hover::before { transform: scaleX(1); }
@@ -668,6 +675,7 @@ onUnmounted(() => {
 .pedido-card.estado-listo     { border-left: 5px solid #28a745; }
 
 
+/* ── Card header ─────────────────────────────────────────── */
 .card-header {
   padding: 14px 18px; background: rgba(0,0,0,0.04);
   border-bottom: 1px solid #e0e0e0;
@@ -681,7 +689,7 @@ onUnmounted(() => {
   gap: 5px; color: #666; font-size: 13px;
 }
 .pedido-num i,
-.hora-info i { color: #e08000; }
+.hora-info i { color: #ff0000; }
 .pedido-num  { font-weight: 700; color: #000; font-size: 14px; }
 
 .estado-badge {
@@ -694,6 +702,7 @@ onUnmounted(() => {
 .estado-listo     .estado-badge { background: #28a745; color: #fff; }
 
 
+/* ── Card body ───────────────────────────────────────────── */
 .card-body { padding: 18px; }
 
 .pizza-header {
@@ -705,7 +714,7 @@ onUnmounted(() => {
   color: #000000; text-transform: uppercase;
 }
 .cantidad-badge {
-  background: #e08000; color: #ffffff;
+  background: #ff0000; color: #ffffff;
   padding: 4px 12px; border-radius: 12px;
   font-weight: 700; font-size: 15px;
 }
@@ -714,9 +723,10 @@ onUnmounted(() => {
   display: flex; align-items: center; gap: 6px;
   font-size: 13px; color: #555; margin-bottom: 10px;
 }
-.tamano-info i { color: #e08000; font-size: 12px; }
+.tamano-info i { color: #ff0000; font-size: 12px; }
 
 
+/* ── Extras ──────────────────────────────────────────────── */
 .extras-lista,
 .combo-lista { margin-bottom: 10px; }
 
@@ -725,17 +735,18 @@ onUnmounted(() => {
   text-transform: uppercase; letter-spacing: 1px;
   margin-bottom: 6px; display: flex; align-items: center; gap: 5px;
 }
-.extras-titulo i { color: #e08000; }
+.extras-titulo i { color: #ff0000; }
 
 .extra-chip {
-  display: inline-block; background: #fff3e0;
-  border: 1px solid #f5c07a; color: #bf5e00;
+  display: inline-block; background: #ffe5e5;
+  border: 1px solid #ffaaaa; color: #990000;
   padding: 3px 10px; border-radius: 12px;
   font-size: 12px; font-weight: 600;
   margin: 2px 4px 2px 0;
 }
 
 
+/* ── Combo ───────────────────────────────────────────────── */
 .combo-prod-chip {
   display: inline-block; background: #f0f4ff;
   border: 1px solid #ccd6ff; color: #1a3acc;
@@ -746,21 +757,23 @@ onUnmounted(() => {
 .combo-tamano { color: #555; font-weight: 400; }
 
 
+/* ── Mitades ─────────────────────────────────────────────── */
 .mitades-lista { margin-bottom: 10px; }
 
 .mitad-bloque {
   background: #f8f9fa; border-radius: 8px;
   padding: 10px 12px; margin-bottom: 8px;
-  border-left: 3px solid #e08000;
+  border-left: 3px solid #ff0000;
 }
 .mitad-titulo {
   font-size: 13px; color: #333;
   margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
 }
-.mitad-titulo i      { color: #e08000; }
+.mitad-titulo i      { color: #ff0000; }
 .mitad-titulo strong { color: #000; }
 
 
+/* ── Notas ───────────────────────────────────────────────── */
 .notas-especiales {
   display: flex; align-items: center; gap: 8px;
   background: #fff3cd; padding: 10px 14px;
@@ -771,6 +784,7 @@ onUnmounted(() => {
 .notas-especiales span { color: #555; font-size: 13px; font-style: italic; }
 
 
+/* ── Card footer ─────────────────────────────────────────── */
 .card-footer {
   padding: 14px 18px; background: rgba(0,0,0,0.04);
   border-top: 1px solid #e0e0e0;
@@ -787,8 +801,8 @@ onUnmounted(() => {
 
 .listo-btn { background: #000000; color: #ffffff; }
 .listo-btn:hover:not(:disabled) {
-  background: #e08000; transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(224,128,0,0.3);
+  background: #ff0000; transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255,0,0,0.3);
 }
 
 .listo-label {
@@ -798,6 +812,7 @@ onUnmounted(() => {
 }
 
 
+/* ── Toast ───────────────────────────────────────────────── */
 .toast-notification {
   position: fixed; bottom: 28px; right: 28px;
   background: #111111; border-left: 5px solid #28a745;
@@ -814,17 +829,93 @@ onUnmounted(() => {
 .toast-slide-leave-to     { opacity: 0; transform: translateX(100%); }
 
 
+/* ── Scrollbar ───────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 8px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
-::-webkit-scrollbar-thumb { background: #e08000; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #bf5e00; }
+::-webkit-scrollbar-thumb { background: #ff0000; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #cc0000; }
 
 
-@media (max-width: 768px) {
-  .header, .logo-area { flex-direction: column; text-align: center; }
-  .pos-header         { flex-direction: column; text-align: center; }
-  .filters-row        { flex-direction: column; align-items: flex-start; }
-  .search-box         { max-width: 100%; width: 100%; }
-  .pedidos-grid       { grid-template-columns: 1fr; }
+/* ── Responsive tablet ───────────────────────────────────── */
+@media (max-width: 900px) {
+  .pedidos-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+}
+
+/* ── Responsive móvil ────────────────────────────────────── */
+@media (max-width: 600px) {
+
+  /* Vista general */
+  .pizzero-view { padding: 10px; }
+
+  /* Header superior */
+  .header {
+    flex-direction: column; align-items: stretch;
+    gap: 10px; margin-bottom: 16px;
+  }
+  .logo-area {
+    flex-direction: row; justify-content: space-between; align-items: center;
+  }
+  .logo { font-size: 22px; letter-spacing: 1px; }
+  .user-info { padding: 8px 14px; }
+  .user-name { font-size: 13px; }
+  .user-role { font-size: 10px; }
+  .logout-btn { width: 100%; justify-content: center; padding: 10px; font-size: 13px; }
+
+  /* Panel header */
+  .pos-panel { border-radius: 12px; }
+  .pos-header {
+    flex-direction: column; align-items: flex-start;
+    padding: 12px 14px; gap: 10px;
+  }
+  .pos-header h2 { font-size: 18px; }
+
+  /* Stats */
+  .header-stats { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-item    { padding: 6px 10px; border-radius: 8px; gap: 6px; }
+  .stat-value   { font-size: 16px; }
+  .stat-label   { font-size: 10px; }
+
+  .date-time { font-size: 11px; }
+
+  /* Filtros */
+  .pos-content { padding: 12px; }
+  .filters-row { flex-direction: column; align-items: stretch; gap: 8px; }
+
+  .category-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .category-tab  { padding: 8px 4px; font-size: 11px; text-align: center; border-radius: 8px; }
+
+  .search-box { max-width: 100%; width: 100%; }
+
+  /* Fila refresh + contador */
+  .refresh-btn   { width: 100%; border-radius: 8px; height: 36px; }
+  .product-count { font-size: 12px; text-align: right; }
+
+  /* Grid de pedidos: 1 columna en móvil */
+  .pedidos-grid { grid-template-columns: 1fr; gap: 12px; }
+
+  /* Card */
+  .pedido-card { border-radius: 10px; }
+  .pedido-card:hover { transform: none; }
+
+  .card-header { padding: 10px 12px; flex-wrap: wrap; gap: 6px; }
+  .pedido-meta { gap: 10px; }
+  .pedido-num  { font-size: 13px; }
+  .hora-info   { font-size: 12px; }
+  .estado-badge { font-size: 10px; padding: 3px 10px; }
+
+  .card-body { padding: 12px; }
+  .pizza-nombre   { font-size: 15px; }
+  .cantidad-badge { font-size: 13px; padding: 3px 10px; }
+
+  .card-footer { padding: 10px 12px; }
+  .action-btn  { padding: 11px; font-size: 13px; }
+  .listo-label { font-size: 12px; }
+
+  /* Toast más pequeño y ancho completo */
+  .toast-notification {
+    bottom: 14px; right: 12px; left: 12px;
+    padding: 12px 16px; border-radius: 10px;
+  }
+  .toast-notification span { font-size: 13px; }
 }
 </style>

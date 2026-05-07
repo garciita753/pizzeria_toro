@@ -162,14 +162,9 @@ const lowStockItems = computed(() =>
 
 
 const loadResumenTurnoActivo = async () => {
-  
   await turnosStore.fetchTurnosAbiertos()
-
-  
   const turnoAbierto = turnosStore.turnosAbiertos[0]
   if (!turnoAbierto) return
-
-  
   await turnosStore.fetchResumenTurno(turnoAbierto.id)
 }
 
@@ -215,6 +210,7 @@ onUnmounted(() => clearInterval(intervalo))
 }
 
 
+/* ── Header ─────────────────────────────────────────────── */
 .header {
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 24px; flex-wrap: wrap; gap: 16px;
@@ -252,6 +248,7 @@ onUnmounted(() => clearInterval(intervalo))
 .logout-btn:hover { background: #ff0000; color: #000; }
 
 
+/* ── Panel ───────────────────────────────────────────────── */
 .panel {
   background: #fff; border-radius: 18px;
   border: 1px solid #ff0000; overflow: hidden;
@@ -259,6 +256,7 @@ onUnmounted(() => clearInterval(intervalo))
 }
 
 
+/* ── Stats ───────────────────────────────────────────────── */
 .stats-strip {
   background: #000; border-bottom: 2px solid #ff0000;
   display: flex; align-items: center; padding: 18px 28px;
@@ -293,6 +291,7 @@ onUnmounted(() => clearInterval(intervalo))
 .stat-trend.dn { color: #ffc107; }
 
 
+/* ── Tabs ────────────────────────────────────────────────── */
 .tabs-nav {
   display: flex; gap: 0; background: #f5f5f5;
   border-bottom: 1px solid #e0e0e0; padding: 0 24px;
@@ -312,22 +311,88 @@ onUnmounted(() => clearInterval(intervalo))
 .tab-btn.active { color: #ff0000; border-bottom-color: #ff0000; }
 
 
+/* ── Tab content ─────────────────────────────────────────── */
 .tab-content { padding: 24px; background: #f5f5f5; }
 
 
+/* ── Scrollbar ───────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #ff0000; border-radius: 3px; }
 
 
+/* ── Responsive tablet ───────────────────────────────────── */
 @media (max-width: 900px) {
-  .stats-strip { flex-direction: column; gap: 14px; }
+  .stats-strip {
+    flex-direction: column; gap: 14px; padding: 16px 20px;
+  }
   .stat-divider { display: none; }
-  .stat-item { width: 100%; }
+  .stat-item    { width: 100%; min-width: 0; }
 }
+
+/* ── Responsive móvil ────────────────────────────────────── */
 @media (max-width: 600px) {
-  .header { flex-direction: column; }
-  .header-right { flex-direction: column; align-items: flex-start; }
-  .datetime { text-align: left; }
+
+  /* Contenedor */
+  .container { padding: 10px; }
+
+  /* Header */
+  .header {
+    flex-direction: column; align-items: stretch;
+    gap: 10px; margin-bottom: 14px;
+  }
+  .logo-area {
+    flex-direction: row; justify-content: space-between; align-items: center;
+  }
+  .logo { font-size: 20px; letter-spacing: 1px; }
+  .user-chip { padding: 6px 12px; }
+  .chip-name { font-size: 12px; }
+  .chip-role { font-size: 10px; }
+
+  .header-right {
+    flex-direction: row; justify-content: space-between;
+    align-items: center; gap: 8px;
+  }
+  .datetime   { font-size: 10px; text-align: left; max-width: 100%; }
+  .logout-btn { font-size: 11px; padding: 7px 14px; }
+
+  /* Panel */
+  .panel { border-radius: 12px; }
+
+  /* Stats: 2 columnas en móvil */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px; padding: 12px;
+    flex-direction: unset;
+  }
+  .stat-divider { display: none; }
+  .stat-item {
+    flex-direction: column; align-items: flex-start;
+    gap: 6px; min-width: 0; padding: 10px;
+    background: #111; border-radius: 10px;
+    border: 1px solid #1f1f1f;
+  }
+  .stat-icon   { width: 32px; height: 32px; border-radius: 8px; }
+  .stat-icon i { font-size: 13px; }
+  .stat-label  { font-size: 10px; }
+  .stat-value  { font-size: 15px; }
+  .stat-trend  { font-size: 10px; }
+
+  /* Tabs: scroll horizontal sin scrollbar visible */
+  .tabs-nav {
+    padding: 0 8px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs-nav::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    padding: 10px 12px; font-size: 11px;
+    gap: 4px; letter-spacing: 0; flex-shrink: 0;
+  }
+  .tab-btn i { font-size: 12px; }
+
+  /* Contenido del tab */
+  .tab-content { padding: 12px; }
 }
 </style>
