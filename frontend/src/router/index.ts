@@ -44,7 +44,7 @@ const router = createRouter({
       path: "/panel_pizzero",
       name: "panel_pizzero",
       component: ()=> import("../views/pizzero/panel_pizzero.vue"),
-      meta: { requiresAuth: false, rol:"pizzero" }
+      meta: { requiresAuth: true, rol:"pizzero" }
     },
     
     {
@@ -64,8 +64,12 @@ const router = createRouter({
   ]
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
+
+  if (authStore.token && !authStore.user) {
+    await authStore.init();
+  }
 
   const requiresAuth = to.meta.requiresAuth;
   const requiredRole = to.meta.rol as string | undefined;
@@ -78,10 +82,9 @@ router.beforeEach((to, from, next) => {
     return next({ name: "login" });
   }
 
-  
   if (requiredRole && authStore.user) {
     if (authStore.user.rol !== requiredRole) {
-      console.warn(" Acceso denegado");
+      console.warn("Acceso denegado");
       return next(redirectByRole(authStore));
     }
   }

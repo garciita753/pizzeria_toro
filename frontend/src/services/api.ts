@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+const rawBaseURL = (import.meta as any).env?.VITE_API_URL || 'https://pizzeriatoro-production.up.railway.app';
+const baseURL = rawBaseURL.replace(/\/+$/, '');
+const isDebugApi = import.meta.env.DEV || (import.meta as any).env?.VITE_DEBUG_API === 'true';
 
-const baseURL = (import.meta as any).env?.VITE_API_URL || 'https://pizzeriatoro-production.up.railway.app'
+if (isDebugApi) {
+	console.debug('[API] baseURL', baseURL);
+}
 
 const api = axios.create({
 	baseURL,
@@ -10,6 +15,9 @@ const api = axios.create({
 
 
 api.interceptors.request.use((config) => {
+	if (isDebugApi) {
+		console.debug('[API] request', config.method, config.url);
+	}
 	const token = localStorage.getItem('token');
 	if (token) {
 		if (!config.headers) (config as any).headers = {};
@@ -25,13 +33,10 @@ api.interceptors.response.use(
 	(response) => response,
 	(error) => {
 		if (error.response?.status === 401) {
-			
 			localStorage.removeItem('token');
 			delete api.defaults.headers.common['Authorization'];
-
-			
-			if (window.location.pathname !== '/') {
-				window.location.href = '/';
+			if (window.location.pathname !== '/login') {
+				window.location.href = '/login';
 			}
 		}
 		return Promise.reject(error);

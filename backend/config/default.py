@@ -13,4 +13,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 SHOW_SQLALCHEMY_LOG_MESSAGES = False
 ERROR_404_HELP = False
 JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=2)
-CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:5173')
+CORS_ORIGINS = os.environ.get(
+    'CORS_ORIGINS',
+    'http://localhost:5173,https://balanced-contentment-production-b0f7.up.railway.app'
+)

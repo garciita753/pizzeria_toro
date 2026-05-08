@@ -26,24 +26,22 @@ jwt=JWTManager()
 def create_app(settings_module):
     app = Flask(__name__)
     app.config.from_object(settings_module)
-    app.config["JWT_SECRET_KEY"] = "1a2v"
-    
-    # CORS origins configuration
-    allowed_origins = [
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "https://balanced-contentment-production-b0f7.up.railway.app"
-    ]
-    
-    # Add Railway frontend domain dynamically if available
-    railway_domain = os.getenv('RAILWAY_FRONTEND_DOMAIN')
-    if railway_domain:
-        allowed_origins.append(f"https://{railway_domain}")
-    
+    app.config["JWT_SECRET_KEY"] = app.config.get("SECRET_KEY") or os.environ.get("JWT_SECRET_KEY", "1a2v")
+    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+
+    cors_origins = app.config.get("CORS_ORIGINS", "")
+    allowed_origins = [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
+    if not allowed_origins:
+        allowed_origins = [
+            "http://localhost:5173",
+            "http://localhost:3000",
+            "https://balanced-contentment-production-b0f7.up.railway.app",
+        ]
+
     CORS(app, resources={r"/api/*": {
-    "origins": allowed_origins,
-    "methods": ["GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"],
-    "allow_headers": ["Content-Type", "Authorization"]
+        "origins": allowed_origins,
+        "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
     }})
     jwt.init_app(app)  
     db.init_app(app)

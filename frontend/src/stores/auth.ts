@@ -77,7 +77,7 @@ export const useAuthStore = defineStore("auth", {
 
     async fetchUser() {
       try {
-        const res = await api.get<MeResponse>("/me");
+        const res = await api.get<MeResponse>("/api/v1.0/me");
         if (res.data?.user) {
           this.setUser({
             id:     res.data.user.id,
@@ -87,12 +87,8 @@ export const useAuthStore = defineStore("auth", {
           });
         }
       } catch (err: unknown) {
-        
-        
-        
-        
-        this.user  = null;
-        this.token = null;
+        console.error('fetchUser failed', err);
+        this.logout();
       }
     },
 
@@ -123,11 +119,13 @@ export const useAuthStore = defineStore("auth", {
             rol:    res.data.rol,
             nombre: res.data.nombre,
           });
+          console.info('[Auth] login successful for', correo, 'role', res.data.rol);
           return { success: true };
         }
 
         return { success: false, message: "Error en login" };
       } catch (err: unknown) {
+        console.error('[Auth] login failed', err);
         return {
           success: false,
           message: getErrorMessage(err) || "Error de conexión",
