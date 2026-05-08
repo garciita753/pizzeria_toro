@@ -1,5 +1,4 @@
 [build]
-buildCommand = "cd backend && python -m pip install -r requirements.txt"
-
+buildCommand = "python -m pip install -r requirements.txt"
 [deploy]
 startCommand = "gunicorn -w 4 -b 0.0.0.0:$PORT entrypoint:app --chdir backend"
