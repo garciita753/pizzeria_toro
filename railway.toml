@@ -1,5 +1,22 @@
 [build]
-buildCommand = "python -m pip install -r requirements.txt"
+builder = "nixpacks"
 
-[deploy]
-startCommand = "python entrypoint.py"
+[[services]]
+name = "backend"
+startCommand = "cd backend && python entrypoint.py"
+buildCommand = "cd backend && python -m pip install -r requirements.txt"
+
+[services.variables]
+PORT = "5000"
+
+[[services]]
+name = "frontend"
+startCommand = "cd frontend && npm run preview -- --host 0.0.0.0 --port 3000"
+buildCommand = "cd frontend && npm install && npm run build-only"
+
+[services.variables]
+PORT = "3000"
+
+[services.domains]
+name = "frontend"
+targetPort = 3000

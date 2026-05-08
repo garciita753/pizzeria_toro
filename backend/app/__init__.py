@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
@@ -26,11 +27,21 @@ def create_app(settings_module):
     app = Flask(__name__)
     app.config.from_object(settings_module)
     app.config["JWT_SECRET_KEY"] = "1a2v"
+    
+    # CORS origins configuration
+    allowed_origins = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://balanced-contentment-production-b0f7.up.railway.app"
+    ]
+    
+    # Add Railway frontend domain dynamically if available
+    railway_domain = os.getenv('RAILWAY_FRONTEND_DOMAIN')
+    if railway_domain:
+        allowed_origins.append(f"https://{railway_domain}")
+    
     CORS(app, resources={r"/api/*": {
-    "origins": [
-            "http://localhost:5173",
-            "https://balanced-contentment-production-b0f7.up.railway.app"
-        ],
+    "origins": allowed_origins,
     "methods": ["GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"],
     "allow_headers": ["Content-Type", "Authorization"]
     }})
