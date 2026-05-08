@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import api from "../services/api";
 import axios from "axios";
 
-type Rol = "admin" | "cajero" | "pizzero";
+type Rol = "Admin" | "Cajero" | "Pizzero";
 
 interface Usuario {
   id:     number;
@@ -60,9 +60,9 @@ export const useAuthStore = defineStore("auth", {
 
   getters: {
     isAuthenticated: (state) => !!state.token,
-    esAdmin:         (state) => state.user?.rol === "admin",
-    esCajero:        (state) => state.user?.rol === "cajero",
-    esPizzero:       (state) => state.user?.rol === "pizzero",
+    esAdmin:         (state) => state.user?.rol === "Admin",
+    esCajero:        (state) => state.user?.rol === "Cajero",
+    esPizzero:       (state) => state.user?.rol === "Pizzero",
   },
 
   actions: {
