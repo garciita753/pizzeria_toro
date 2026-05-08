@@ -7,15 +7,20 @@ import panel_pizzero from "../views/pizzero/panel_pizzero.vue";
 
 
 function redirectByRole(authStore: ReturnType<typeof useAuthStore>) {
-  if (authStore.user?.rol === "Admin") {
+  const role = authStore.user?.rol?.toLowerCase();
+  if (role === "admin") {
     return { name: "adminDashboard" };
   }
 
-  if (authStore.user?.rol === "Cajero") {
+  if (role === "cajero") {
     return { name: "cajeroVentas" };
   }
-  if(authStore.user?.rol === "Pizzero")
-  return { name: "panel_pizzero" };
+
+  if (role === "pizzero") {
+    return { name: "panel_pizzero" };
+  }
+
+  return { name: "home" };
 }
 
 const router = createRouter({
@@ -72,7 +77,7 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const requiresAuth = to.meta.requiresAuth;
-  const requiredRole = to.meta.rol as string | undefined;
+  const requiredRole = (to.meta.rol as string | undefined)?.toLowerCase();
 
   if ((to.name === "login" || to.name === "register") && authStore.isAuthenticated) {
     return next(redirectByRole(authStore));

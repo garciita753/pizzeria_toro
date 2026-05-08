@@ -60,9 +60,9 @@ export const useAuthStore = defineStore("auth", {
 
   getters: {
     isAuthenticated: (state) => !!state.token,
-    esAdmin:         (state) => state.user?.rol === "Admin",
-    esCajero:        (state) => state.user?.rol === "Cajero",
-    esPizzero:       (state) => state.user?.rol === "Pizzero",
+    esAdmin:         (state) => state.user?.rol?.toLowerCase() === "admin",
+    esCajero:        (state) => state.user?.rol?.toLowerCase() === "cajero",
+    esPizzero:       (state) => state.user?.rol?.toLowerCase() === "pizzero",
   },
 
   actions: {
@@ -82,7 +82,7 @@ export const useAuthStore = defineStore("auth", {
           this.setUser({
             id:     res.data.user.id,
             correo: res.data.user.correo,
-            rol:    res.data.user.rol as Rol,
+            rol:    res.data.user.rol.toLowerCase() as Rol,
             nombre: res.data.user.nombre,
           });
         }
@@ -116,7 +116,7 @@ export const useAuthStore = defineStore("auth", {
           this.setUser({
             id:     res.data.id,
             correo,
-            rol:    res.data.rol,
+            rol:    res.data.rol.toLowerCase() as Rol,
             nombre: res.data.nombre,
           });
           console.info('[Auth] login successful for', correo, 'role', res.data.rol);
