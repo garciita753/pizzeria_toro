@@ -182,7 +182,7 @@ class UsuariosList_Resource(Resource):
 
 api.add_resource(Registro_Resource, '/api/v1.0/registrar/', '/Registro_Resource')
 api.add_resource(Login_Resource, '/api/v1.0/login/', '/Login_Resource')
-api.add_resource(Usuario_Resource, '/me')
+api.add_resource(Usuario_Resource,  '/api/v1.0/me')
 api.add_resource(UsuarioEdit_Resource, '/api/v1.0/usuarios/<int:usuario_id>')
 api.add_resource(CambiarContrasena_Resource, '/api/v1.0/cambiar_contrasena')
 api.add_resource(UsuariosList_Resource, '/api/v1.0/list')
