@@ -44,14 +44,14 @@ const router = createRouter({
       path: "/panel_pizzero",
       name: "panel_pizzero",
       component: ()=> import("../views/pizzero/panel_pizzero.vue"),
-      meta: { requiresAuth: true, rol:"pizzero" }
+      meta: { requiresAuth: true, rol:"Pizzero" }
     },
     
     {
       path: "/cajero",
       name: "cajeroVentas",
       component: () => import("../views/cajero/panel_cajero.vue"),
-      meta: { requiresAuth: true, rol: "cajero" }
+      meta: { requiresAuth: true, rol: "Cajero" }
     },
 
     
@@ -59,7 +59,7 @@ const router = createRouter({
       path: "/admin",
       name: "adminDashboard",
       component: () => import("../views/admin/PanelAdmin.vue"),
-      meta: { requiresAuth: true, rol: "admin" }
+      meta: { requiresAuth: true, rol: "Admin" }
     }
   ]
 });
