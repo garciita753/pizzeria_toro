@@ -44,7 +44,7 @@ export const getUsuarios = (params?: { rol?: string; activo?: boolean }) =>
   api.get<{ users: Usuario[] }>("/api/v1.0/list", { params })
 
 export const getUsuarioMe = () =>
-  api.get<{ user: Usuario }>("/me")
+  api.get<{ user: Usuario }>("/api/v1.0/me")
 
 export const updateUsuario = (id: number, data: UsuarioEditPayload) =>
   api.put<{ message: string; user: Usuario }>(`/api/v1.0/usuarios/${id}`, data)
