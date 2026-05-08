@@ -11,7 +11,7 @@ if (isDebugApi) {
 const api = axios.create({
 	baseURL,
 	timeout: 120000,
-});
+});//comentario
 
 
 api.interceptors.request.use((config) => {
