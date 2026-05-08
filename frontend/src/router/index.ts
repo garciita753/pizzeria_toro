@@ -7,14 +7,14 @@ import panel_pizzero from "../views/pizzero/panel_pizzero.vue";
 
 
 function redirectByRole(authStore: ReturnType<typeof useAuthStore>) {
-  if (authStore.user?.rol === "admin") {
+  if (authStore.user?.rol === "Admin") {
     return { name: "adminDashboard" };
   }
 
-  if (authStore.user?.rol === "cajero") {
+  if (authStore.user?.rol === "Cajero") {
     return { name: "cajeroVentas" };
   }
-  if(authStore.user?.rol === "pizzero")
+  if(authStore.user?.rol === "Pizzero")
   return { name: "panel_pizzero" };
 }
 
