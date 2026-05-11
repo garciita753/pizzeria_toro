@@ -2,7 +2,6 @@
   <div v-if="show" class="modal" @click.self="$emit('close')">
     <div class="modal-content">
 
-      
       <div class="modal-header">
         <h3>
           <i class="fas fa-edit"></i>
@@ -13,34 +12,54 @@
         </button>
       </div>
 
-      
       <div v-if="loadingCombo" class="skeleton-wrap">
         <i class="fas fa-spinner fa-spin"></i> Cargando combo...
       </div>
 
       <form v-else @submit.prevent="handleSubmit" class="product-form">
 
-        
         <div class="form-group">
           <label for="nombre-edit">
             <i class="fas fa-tag"></i> Nombre del combo
+            <span class="required">*</span>
           </label>
-          <input
-            id="nombre-edit"
-            type="text"
-            v-model="form.nombre"
-            placeholder="Ej: Combo Familiar"
-            required
-          />
-          <span v-if="errors.nombre" class="field-error">{{ errors.nombre }}</span>
+          <div class="input-wrapper">
+            <input
+              id="nombre-edit"
+              type="text"
+              v-model="form.nombre"
+              placeholder="Ej: Combo Familiar"
+              :class="{
+                'input-error': campoConError('nombre_combo'),
+                'input-valid': campoValido('nombre_combo', form.nombre)
+              }"
+              @input="validarCampo('nombre_combo', form.nombre)"
+            />
+            <span v-if="touched.nombre_combo && form.nombre" class="input-icon">
+              <i class="fas"
+                :class="!errors.nombre_combo ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
+              ></i>
+            </span>
+          </div>
+          <transition name="fade">
+            <span v-if="errors.nombre_combo" class="field-error">
+              <i class="fas fa-exclamation-triangle"></i> {{ errors.nombre_combo }}
+            </span>
+          </transition>
         </div>
 
-        
         <div class="form-group">
           <label for="precio-edit">
             <i class="fas fa-dollar-sign"></i> Precio (Bs)
+            <span class="required">*</span>
           </label>
-          <div class="input-prefix">
+          <div
+            class="input-prefix"
+            :class="{
+              'prefix-error': campoConError('precio'),
+              'prefix-valid': touched.precio && !errors.precio && Number(form.precio) > 0
+            }"
+          >
             <span class="prefix">Bs</span>
             <input
               id="precio-edit"
@@ -49,20 +68,27 @@
               step="0.01"
               min="0"
               placeholder="0.00"
-              required
+              @input="validarPrecio('precio', form.precio)"
             />
+            <span v-if="touched.precio" class="input-icon-prefix">
+              <i class="fas"
+                :class="!errors.precio ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
+              ></i>
+            </span>
           </div>
-          <span v-if="errors.precio" class="field-error">{{ errors.precio }}</span>
+          <transition name="fade">
+            <span v-if="errors.precio" class="field-error">
+              <i class="fas fa-exclamation-triangle"></i> {{ errors.precio }}
+            </span>
+          </transition>
         </div>
 
-        
         <div class="section-block">
           <div class="section-title">
             <i class="fas fa-list-ul"></i>
             Productos del combo
           </div>
 
-          
           <div v-if="productosActuales.length > 0" class="cantidad-list">
             <div
               v-for="item in productosActuales"
@@ -92,7 +118,6 @@
             <i class="fas fa-exclamation-circle"></i> Sin productos aún
           </div>
 
-          
           <div class="add-more-title">
             <i class="fas fa-plus-circle"></i> Agregar más productos
           </div>
@@ -130,7 +155,6 @@
               </div>
             </div>
 
-            
             <div v-if="productosNuevos.length > 0" class="selected-block">
               <div class="selected-block-title">
                 <i class="fas fa-plus"></i> Por agregar
@@ -163,7 +187,6 @@
           </template>
         </div>
 
-        
         <div class="form-group form-group--checkbox">
           <label class="checkbox-label">
             <div class="toggle-switch">
@@ -179,9 +202,8 @@
           </label>
         </div>
 
-        
         <div class="modal-buttons">
-          <button type="submit" class="modal-btn primary" :disabled="loading">
+          <button type="submit" class="modal-btn primary" :disabled="loading || !formularioValido">
             <i class="fas" :class="loading ? 'fa-spinner fa-spin' : 'fa-save'"></i>
             {{ loading ? 'GUARDANDO...' : 'GUARDAR CAMBIOS' }}
           </button>
@@ -204,11 +226,8 @@
 import { ref, computed, watch } from 'vue'
 import { useStoreCombos }    from '@/stores/combos/combo_store'
 import { useStoreProductos } from '@/stores/productos/productos'
-import type {
-  UpdateComboPayload,
-  AddProductoPayload,
-} from '@/services/combo_service'
-
+import { useValidacion, REGEX } from '@/composables/useValidacion'
+import type { UpdateComboPayload, AddProductoPayload } from '@/services/combo_service'
 
 const props = defineProps<{
   show:    boolean
@@ -216,16 +235,24 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ close: [] }>()
 
-
 const combosStore    = useStoreCombos()
 const productosStore = useStoreProductos()
 
+const {
+  errors,
+  touched,
+  validarCampo,
+  validarPrecio,
+  campoConError,
+  campoValido,
+  resetValidacion,
+} = useValidacion()
 
 interface ProductoActual {
   producto_id: number
   nombre:      string
   cantidad:    number
-  saving:      boolean   
+  saving:      boolean
 }
 
 interface ProductoNuevo {
@@ -233,52 +260,13 @@ interface ProductoNuevo {
   cantidad:    number
 }
 
-
-const form = ref({ nombre: '', precio: 0 as number, activo: true })
-const errors      = ref<Record<string, string>>({})
-const loading     = ref(false)
-const loadingCombo = ref(false)
-const serverError = ref('')
-
-
-const productosActuales = ref<ProductoActual[]>([])   
-const productosNuevos   = ref<ProductoNuevo[]>([])    
+const form             = ref({ nombre: '', precio: 0 as number, activo: true })
+const loading          = ref(false)
+const loadingCombo     = ref(false)
+const serverError      = ref('')
+const productosActuales = ref<ProductoActual[]>([])
+const productosNuevos   = ref<ProductoNuevo[]>([])
 const busquedaProducto  = ref('')
-
-
-watch(() => props.show, async (visible) => {
-  if (!visible || !props.comboId) return
-
-  loadingCombo.value    = true
-  errors.value          = {}
-  serverError.value     = ''
-  busquedaProducto.value = ''
-  productosNuevos.value  = []
-
-  await Promise.all([
-    productosStore.fetchProductos(),
-    combosStore.fetchCombos(),
-  ])
-
-  const combo = combosStore.combos.find(c => c.id === props.comboId)
-  if (combo) {
-    form.value = {
-      nombre: combo.nombre,
-      precio: combo.precio,
-      activo: combo.activo,
-    }
-    
-    productosActuales.value = (combo.productos ?? []).map(p => ({
-      producto_id: p.producto_id,
-      nombre:      p.nombre,
-      cantidad:    p.cantidad,
-      saving:      false,
-    }))
-  }
-
-  loadingCombo.value = false
-})
-
 
 const productosFiltrados = computed(() => {
   const lista = productosStore.productos.filter(p => p.activo)
@@ -288,19 +276,20 @@ const productosFiltrados = computed(() => {
   )
 })
 
+const formularioValido = computed(() => {
+  const nombreOk   = REGEX.nombre_combo.test(form.value.nombre.trim())
+  const precioOk   = Number(form.value.precio) > 0
+  const sinErrores = Object.values(errors.value).every(e => !e)
+  return nombreOk && precioOk && sinErrores
+})
 
-const estaEnActuales = (id: number) =>
-  productosActuales.value.some(p => p.producto_id === id)
-
-const estaEnNuevos = (id: number) =>
-  productosNuevos.value.some(p => p.producto_id === id)
-
+const estaEnActuales  = (id: number) => productosActuales.value.some(p => p.producto_id === id)
+const estaEnNuevos    = (id: number) => productosNuevos.value.some(p => p.producto_id === id)
 const getNombreProducto = (id: number) =>
   productosStore.productos.find(p => p.id === id)?.nombre ?? `Producto #${id}`
 
-
 const incrementarExistente = async (item: ProductoActual) => {
-  item.saving  = true
+  item.saving = true
   const nuevaCantidad = item.cantidad + 1
   const ok = await combosStore.actualizarCantidadProducto(props.comboId!, item.producto_id, nuevaCantidad)
   if (ok) item.cantidad = nuevaCantidad
@@ -309,7 +298,7 @@ const incrementarExistente = async (item: ProductoActual) => {
 
 const decrementarExistente = async (item: ProductoActual) => {
   if (item.cantidad <= 1) return
-  item.saving  = true
+  item.saving = true
   const nuevaCantidad = item.cantidad - 1
   const ok = await combosStore.actualizarCantidadProducto(props.comboId!, item.producto_id, nuevaCantidad)
   if (ok) item.cantidad = nuevaCantidad
@@ -326,14 +315,10 @@ const eliminarExistente = async (item: ProductoActual) => {
   item.saving = false
 }
 
-
 const toggleNuevo = (id: number) => {
   const idx = productosNuevos.value.findIndex(p => p.producto_id === id)
-  if (idx === -1) {
-    productosNuevos.value.push({ producto_id: id, cantidad: 1 })
-  } else {
-    productosNuevos.value.splice(idx, 1)
-  }
+  if (idx === -1) productosNuevos.value.push({ producto_id: id, cantidad: 1 })
+  else            productosNuevos.value.splice(idx, 1)
 }
 
 const incrementarNuevo = (id: number) => {
@@ -350,30 +335,52 @@ const quitarNuevo = (id: number) => {
   productosNuevos.value = productosNuevos.value.filter(p => p.producto_id !== id)
 }
 
+watch(() => props.show, async (visible) => {
+  if (!visible || !props.comboId) return
 
-function validate(): boolean {
-  errors.value = {}
-  if (!form.value.nombre.trim())
-    errors.value.nombre = 'El nombre es obligatorio'
-  if (!form.value.precio || Number(form.value.precio) <= 0)
-    errors.value.precio = 'El precio debe ser mayor a 0'
-  return Object.keys(errors.value).length === 0
-}
+  loadingCombo.value     = true
+  serverError.value      = ''
+  busquedaProducto.value = ''
+  productosNuevos.value  = []
+  resetValidacion()
 
+  await Promise.all([
+    productosStore.fetchProductos(),
+    combosStore.fetchCombos(),
+  ])
+
+  const combo = combosStore.combos.find(c => c.id === props.comboId)
+  if (combo) {
+    form.value = {
+      nombre: combo.nombre,
+      precio: combo.precio,
+      activo: combo.activo,
+    }
+    productosActuales.value = (combo.productos ?? []).map(p => ({
+      producto_id: p.producto_id,
+      nombre:      p.nombre,
+      cantidad:    p.cantidad,
+      saving:      false,
+    }))
+  }
+
+  loadingCombo.value = false
+})
 
 const handleSubmit = async () => {
-  if (!validate() || !props.comboId) return
+  validarCampo('nombre_combo', form.value.nombre)
+  validarPrecio('precio', form.value.precio)
+  if (!formularioValido.value || !props.comboId) return
 
   loading.value     = true
   serverError.value = ''
 
   try {
-    
     const payload: UpdateComboPayload = {
       precio: form.value.precio,
       activo: form.value.activo,
     }
-    
+
     const combo = combosStore.combos.find(c => c.id === props.comboId)
     if (combo && combo.nombre !== form.value.nombre) {
       Object.assign(payload, { nombre: form.value.nombre })
@@ -385,7 +392,6 @@ const handleSubmit = async () => {
       return
     }
 
-    
     for (const item of productosNuevos.value) {
       const prodPayload: AddProductoPayload = {
         producto_id: item.producto_id,
@@ -407,7 +413,6 @@ const handleSubmit = async () => {
 <style scoped>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-
 .modal {
   display: flex; position: fixed; inset: 0;
   background: rgba(0,0,0,0.85); justify-content: center; align-items: center;
@@ -423,7 +428,6 @@ const handleSubmit = async () => {
   from { transform: translateY(-30px); opacity: 0; }
   to   { transform: translateY(0);     opacity: 1; }
 }
-
 
 .modal-header {
   display: flex; justify-content: space-between; align-items: center;
@@ -443,13 +447,11 @@ const handleSubmit = async () => {
 }
 .close-btn:hover { background: #ff0000; }
 
-
 .skeleton-wrap {
   padding: 40px; text-align: center; color: #888; font-size: 14px;
   display: flex; align-items: center; justify-content: center; gap: 10px;
   font-family: 'Montserrat', sans-serif;
 }
-
 
 .product-form {
   padding: 24px 28px 28px; display: flex; flex-direction: column;
@@ -459,26 +461,56 @@ const handleSubmit = async () => {
 .form-group label { color: #000; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 7px; }
 .form-group label i { color: #ff0000; font-size: 13px; }
 
+.required       { color: #ff0000; font-size: 15px; font-weight: 800; }
+.optional-label { color: #999; font-weight: 400; font-size: 12px; margin-left: 4px; }
+
+.input-wrapper { position: relative; }
+.input-icon {
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%); font-size: 16px; pointer-events: none;
+}
 
 .form-group input[type="text"],
 .form-group input[type="number"] {
-  width: 100%; padding: 12px 14px; border: 2px solid #e0e0e0; border-radius: 10px;
+  width: 100%; padding: 12px 38px 12px 14px; border: 2px solid #e0e0e0; border-radius: 10px;
   font-size: 14px; font-family: 'Montserrat', sans-serif; color: #000;
-  background: #fafafa; transition: border-color 0.25s, box-shadow 0.25s;
+  background: #fafafa; transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+  box-sizing: border-box;
 }
-.form-group input:focus { border-color: #ff0000; box-shadow: 0 0 0 3px rgba(255,0,0,0.1); outline: none; background: #fff; }
+.form-group input:focus {
+  border-color: #ff0000; box-shadow: 0 0 0 3px rgba(255,0,0,0.1); outline: none; background: #fff;
+}
+.form-group input.input-error { border-color: #ff0000; background: #fff5f5; }
+.form-group input.input-valid { border-color: #22c55e; background: #f0fdf4; box-shadow: 0 0 0 3px rgba(34,197,94,0.12); }
 
+.icon-ok  { color: #22c55e; }
+.icon-err { color: #ff0000; }
 
-.input-prefix { display: flex; align-items: center; border: 2px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fafafa; transition: all 0.25s; }
+.input-prefix {
+  display: flex; align-items: center; border: 2px solid #e0e0e0;
+  border-radius: 8px; overflow: hidden; background: #fafafa;
+  transition: all 0.25s; position: relative;
+}
 .input-prefix:focus-within { border-color: #ff0000; box-shadow: 0 0 0 3px rgba(255,0,0,0.1); background: #fff; }
-.prefix { padding: 10px 12px; background: #ff0000; color: #fff; font-weight: 700; font-size: 13px; white-space: nowrap; min-width: 45px; text-align: center; }
-.input-prefix input { border: none !important; box-shadow: none !important; border-radius: 0 !important; flex: 1; background: transparent; padding: 10px 8px !important; text-align: right; }
+.input-prefix.prefix-error { border-color: #ff0000; background: #fff5f5; }
+.input-prefix.prefix-valid { border-color: #22c55e; background: #f0fdf4; box-shadow: 0 0 0 3px rgba(34,197,94,0.12); }
+
+.prefix {
+  padding: 10px 12px; background: #ff0000; color: #fff; font-weight: 700;
+  font-size: 13px; white-space: nowrap; min-width: 45px; text-align: center; flex-shrink: 0;
+}
+.input-prefix input {
+  border: none !important; box-shadow: none !important; border-radius: 0 !important;
+  flex: 1; background: transparent; padding: 10px 36px 10px 8px !important;
+  text-align: right; font-size: 14px; font-family: 'Montserrat', sans-serif;
+}
 .input-prefix input:focus { border: none; box-shadow: none; outline: none; }
+.input-icon-prefix { position: absolute; right: 10px; font-size: 16px; pointer-events: none; }
 
+.field-error { color: #cc0000; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
 
-.field-error { color: #dc3545; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
-.field-error::before { content: '⚠'; }
-
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s, transform 0.2s; }
+.fade-enter-from, .fade-leave-to       { opacity: 0; transform: translateY(-4px); }
 
 .section-block { background: #fafafa; border: 2px solid #e8e8e8; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
 .section-title { font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; color: #000; display: flex; align-items: center; gap: 8px; }
@@ -491,12 +523,10 @@ const handleSubmit = async () => {
 }
 .add-more-title i { color: #ff0000; }
 
-
 .search-input-wrap { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 10px; background: #fff; transition: border-color 0.25s; }
 .search-input-wrap:focus-within { border-color: #ff0000; box-shadow: 0 0 0 3px rgba(255,0,0,0.1); }
-.search-icon { color: #999; font-size: 13px; }
+.search-icon  { color: #999; font-size: 13px; }
 .search-input { border: none; outline: none; flex: 1; font-size: 13px; font-family: 'Montserrat', sans-serif; color: #333; background: transparent; }
-
 
 .ingredientes-grid { display: flex; flex-wrap: wrap; gap: 8px; max-height: 160px; overflow-y: auto; padding: 4px 2px; }
 .ingrediente-chip { display: flex; align-items: center; gap: 6px; padding: 7px 12px; border: 2px solid #e0e0e0; border-radius: 30px; font-size: 12px; font-weight: 600; color: #555; cursor: pointer; background: #fff; transition: all 0.2s; user-select: none; }
@@ -509,8 +539,8 @@ const handleSubmit = async () => {
 .ingrediente-chip.disabled { opacity: 0.4; cursor: not-allowed; }
 .chip-extra { font-size: 10px; background: rgba(0,0,0,0.1); padding: 2px 5px; border-radius: 4px; white-space: nowrap; }
 .ingrediente-chip.selected .chip-extra { background: rgba(255,255,255,0.25); color: #fff; }
-.no-results { font-size: 12px; color: #aaa; padding: 10px; text-align: center; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
+.no-results { font-size: 12px; color: #aaa; padding: 10px; text-align: center; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
 .selected-block { background: #fff; border: 1px solid #ffcdcd; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 .selected-block-title { font-size: 12px; font-weight: 700; color: #cc0000; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
@@ -527,7 +557,6 @@ const handleSubmit = async () => {
 .qty-btn--remove:hover:not(:disabled) { background: #dc3545; border-color: #dc3545; }
 .qty-value { font-size: 14px; font-weight: 800; color: #000; min-width: 22px; text-align: center; }
 
-
 .form-group--checkbox { margin-top: 4px; }
 .checkbox-label { display: flex !important; flex-direction: row !important; align-items: center; gap: 14px; cursor: pointer; }
 .toggle-switch { position: relative; width: 52px; height: 28px; flex-shrink: 0; }
@@ -540,9 +569,7 @@ const handleSubmit = async () => {
 .checkbox-title { font-weight: 700; font-size: 14px; color: #000; }
 .checkbox-sub   { font-size: 12px; color: #888; }
 
-
 .loading-text { font-size: 13px; color: #888; display: flex; align-items: center; gap: 8px; padding: 10px; }
-
 
 .modal-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
 .modal-btn { padding: 14px; border: none; border-radius: 50px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.25s; text-transform: uppercase; font-family: 'Montserrat', sans-serif; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -552,14 +579,11 @@ const handleSubmit = async () => {
 .modal-btn.secondary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
 .modal-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-
 .form-error { margin-top: 4px; color: #ff3333; font-weight: 600; text-align: center; font-size: 13px; }
-
 
 ::-webkit-scrollbar       { width: 6px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #ff0000; border-radius: 4px; }
-
 
 @media (max-width: 480px) {
   .modal-content { border-radius: 16px; }

@@ -2,7 +2,6 @@
   <div v-if="show" class="modal" @click.self="$emit('close')">
     <div class="modal-content">
 
-      
       <div class="modal-header">
         <h3>
           <i class="fas fa-plus-circle"></i>
@@ -15,7 +14,6 @@
 
       <form @submit.prevent="handleSubmit" class="product-form">
 
-        
         <div class="form-group">
           <label for="nombre">
             <i class="fas fa-leaf"></i> Nombre del ingrediente
@@ -28,10 +26,10 @@
               v-model="form.nombre"
               placeholder="Ej: Mozzarella extra"
               :class="{
-                'input-error': errors.nombre,
-                'input-valid': form.nombre && !errors.nombre && touched.nombre
+                'input-error': campoConError('nombre'),
+                'input-valid': campoValido('nombre', form.nombre)
               }"
-              @input="validarCampo('nombre')"
+              @input="validarCampo('nombre', form.nombre)"
             />
             <span v-if="touched.nombre && form.nombre" class="input-icon">
               <i class="fas"
@@ -46,7 +44,6 @@
           </transition>
         </div>
 
-        
         <div class="form-group">
           <label for="precio_extra">
             <i class="fas fa-dollar-sign"></i> Precio extra base (Bs)
@@ -54,8 +51,8 @@
             <span class="badge-tooltip" title="Precio por defecto sin tamaño específico">?</span>
           </label>
           <div class="input-prefix" :class="{
-            'prefix-error': errors.precio_extra,
-            'prefix-valid': touched.precio_extra && !errors.precio_extra && form.precio_extra !== null
+            'prefix-error': campoConError('precio_extra'),
+            'prefix-valid': campoValido('precio_extra', String(form.precio_extra))
           }">
             <span class="prefix">Bs</span>
             <input
@@ -63,7 +60,7 @@
               type="text"
               v-model="form.precio_extra"
               placeholder="0.00"
-              @input="validarCampo('precio_extra')"
+              @input="validarCampo('precio_extra', String(form.precio_extra))"
             />
             <span v-if="touched.precio_extra" class="input-icon-prefix">
               <i class="fas"
@@ -82,7 +79,6 @@
           </p>
         </div>
 
-        
         <div class="section-block">
           <div class="section-title">
             <i class="fas fa-ruler-combined"></i>
@@ -119,7 +115,6 @@
             </div>
           </div>
 
-          
           <div v-if="tamañosConfigurados.length > 0" class="selected-summary">
             <span class="selected-count">
               <i class="fas fa-check-circle"></i>
@@ -131,7 +126,6 @@
           </div>
         </div>
 
-        
         <div class="form-group form-group--checkbox">
           <label class="checkbox-label">
             <div class="toggle-switch">
@@ -147,7 +141,6 @@
           </label>
         </div>
 
-        
         <div class="modal-buttons">
           <button type="submit" class="modal-btn primary" :disabled="loading || !formularioValido">
             <i class="fas" :class="loading ? 'fa-spinner fa-spin' : 'fa-plus'"></i>
@@ -171,15 +164,15 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useStoreIngredientes } from '@/stores/productos/ingredientes'
+import { useValidacion, REGEX } from '@/composables/useValidacion'
 import type { IngredientePayload, IngredienteTamanoPayload } from '@/services/ingrediente_service'
-
 
 const props = defineProps<{ show: boolean }>()
 const emit  = defineEmits<{ close: [] }>()
 
-
 const ingredientesStore = useStoreIngredientes()
 
+const { errors, touched, validarCampo, campoConError, campoValido, resetValidacion } = useValidacion()
 
 const TAMANOS = [
   { id: 1, nombre: 'Pequeña',  emoji: '🍕' },
@@ -187,15 +180,6 @@ const TAMANOS = [
   { id: 3, nombre: 'Familiar', emoji: '🍕' },
   { id: 4, nombre: 'Grande',   emoji: '🍕' },
 ] as const
-
-
-const REGEX = {
-  
-  nombre:       /^[a-zA-ZÀ-ÿ\s.]{3,}$/,
-  
-  precio_extra: /^\d+(\.\d{1,2})?$/,
-}
-
 
 const defaultForm = () => ({
   nombre:        '',
@@ -205,19 +189,15 @@ const defaultForm = () => ({
 })
 
 const form        = ref(defaultForm())
-const errors      = ref<Record<string, string>>({})
-const touched     = ref<Record<string, boolean>>({})   
 const loading     = ref(false)
 const serverError = ref('')
-
 
 const tamañosConfigurados = computed(() =>
   TAMANOS.filter(t => Number(form.value.preciosTamano[t.id]) > 0)
 )
 
-
 const formularioValido = computed(() => {
-  const nombreOk = REGEX.nombre.test(String(form.value.nombre).trim())
+  const nombreOk = REGEX.nombre.test(form.value.nombre.trim())
   const precioOk = REGEX.precio_extra.test(String(form.value.precio_extra).trim()) &&
                    Number(form.value.precio_extra) >= 0
   const sinErrores = Object.values(errors.value).every(e => !e)
@@ -228,55 +208,21 @@ function limpiarTamanos() {
   form.value.preciosTamano = { 1: 0, 2: 0, 3: 0, 4: 0 }
 }
 
-
 watch(() => props.show, (visible) => {
   if (visible) {
     form.value        = defaultForm()
-    errors.value      = {}
-    touched.value     = {}
     serverError.value = ''
+    resetValidacion()
   }
 })
 
-
-type CampoValidable = "nombre" | "precio_extra"
-
-
-const validarCampo = (campo: 'nombre' | 'precio_extra') => {
-  touched.value[campo] = true
-  const valor = String(form.value[campo as CampoValidable]).trim()
-
-  if (!valor) {
-    const obligatorios: Record<string, string> = {
-      nombre:       'El nombre es obligatorio.',
-      precio_extra: 'El precio extra es obligatorio.',
-    }
-    errors.value[campo] = obligatorios[campo]
-    return
-  }
-
-  const mensajes: Record<string, string> = {
-    nombre:       'Mín. 3 letras. Sin números ni caracteres especiales.',
-    precio_extra: 'Solo números positivos. Máx. 2 decimales. Ej: 5.50',
-  }
-
-  errors.value[campo] = REGEX[campo].test(valor) ? '' : mensajes[campo]
-
-  
-  if (campo === 'precio_extra' && Number(valor) < 0) {
-    errors.value[campo] = 'El precio no puede ser negativo.'
-  }
-}
-
-
 const handleSubmit = async () => {
-  
-  validarCampo('nombre')
-  validarCampo('precio_extra')
+  validarCampo('nombre',       form.value.nombre)
+  validarCampo('precio_extra', String(form.value.precio_extra))
   if (!formularioValido.value) return
 
   const payload: IngredientePayload = {
-    nombre:       String(form.value.nombre).trim(),
+    nombre:       form.value.nombre.trim(),
     precio_extra: Number(form.value.precio_extra),
     activo:       form.value.activo,
   }
@@ -317,7 +263,6 @@ const handleSubmit = async () => {
 <style scoped>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-
 .modal {
   display: flex;
   position: fixed;
@@ -348,7 +293,6 @@ const handleSubmit = async () => {
   from { transform: translateY(-30px); opacity: 0; }
   to   { transform: translateY(0);     opacity: 1; }
 }
-
 
 .modal-header {
   display: flex;
@@ -386,7 +330,6 @@ const handleSubmit = async () => {
 }
 .close-btn:hover { background: #ff0000; }
 
-
 .product-form {
   padding: 24px 28px 28px;
   display: flex;
@@ -412,7 +355,6 @@ const handleSubmit = async () => {
 
 .form-group label i { color: #ff0000; font-size: 13px; }
 
-
 .required { color: #ff0000; font-size: 15px; font-weight: 800; }
 
 .optional-label {
@@ -436,7 +378,6 @@ const handleSubmit = async () => {
   margin-left: 2px;
 }
 
-
 .input-wrapper { position: relative; }
 
 .input-icon {
@@ -446,7 +387,6 @@ const handleSubmit = async () => {
   font-size: 16px;
   pointer-events: none;
 }
-
 
 .form-group input[type="text"],
 .form-group input[type="number"] {
@@ -479,7 +419,6 @@ const handleSubmit = async () => {
   background: #f0fdf4;
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
 }
-
 
 .input-prefix {
   display: flex;
@@ -540,7 +479,6 @@ const handleSubmit = async () => {
   outline: none;
 }
 
-
 .input-icon-prefix {
   position: absolute;
   right: 10px;
@@ -548,15 +486,12 @@ const handleSubmit = async () => {
   pointer-events: none;
 }
 
-
 .input-prefix.small { border-radius: 6px; }
 .input-prefix.small .prefix { padding: 6px 8px; font-size: 11px; min-width: 35px; }
 .input-prefix.small input   { padding: 6px 6px !important; font-size: 12px; }
 
-
 .icon-ok  { color: #22c55e; }
 .icon-err { color: #ff0000; }
-
 
 .field-error {
   color: #cc0000;
@@ -567,10 +502,8 @@ const handleSubmit = async () => {
   gap: 5px;
 }
 
-
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s, transform 0.2s; }
 .fade-enter-from, .fade-leave-to       { opacity: 0; transform: translateY(-4px); }
-
 
 .section-block {
   background: #fafafa;
@@ -594,7 +527,6 @@ const handleSubmit = async () => {
 }
 
 .section-title i { color: #ff0000; }
-
 
 .tamanos-grid {
   display: grid;
@@ -641,7 +573,6 @@ const handleSubmit = async () => {
 .tamano-card .input-prefix        { width: 100%; }
 .tamano-card .input-prefix input  { text-align: right; }
 
-
 .selected-summary {
   display: flex;
   align-items: center;
@@ -683,7 +614,6 @@ const handleSubmit = async () => {
 .clear-btn:hover { background: #ff0000; color: white; border-color: #ff0000; }
 .clear-btn i     { font-size: 10px; }
 
-
 .hint-text {
   font-size: 11px;
   color: #888;
@@ -693,7 +623,6 @@ const handleSubmit = async () => {
   line-height: 1.4;
 }
 .hint-text i { color: #ff0000; margin-top: 1px; flex-shrink: 0; }
-
 
 .form-group--checkbox { margin-top: 4px; }
 
@@ -740,7 +669,6 @@ const handleSubmit = async () => {
 .checkbox-title { font-weight: 700; font-size: 14px; color: #000; }
 .checkbox-sub   { font-size: 12px; color: #888; }
 
-
 .modal-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -774,7 +702,6 @@ const handleSubmit = async () => {
 }
 .modal-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-
 .form-error {
   margin-top: 4px;
   color: #ff3333;
@@ -783,11 +710,9 @@ const handleSubmit = async () => {
   font-size: 13px;
 }
 
-
 ::-webkit-scrollbar       { width: 6px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #ff0000; border-radius: 4px; }
-
 
 @media (max-width: 480px) {
   .modal-content { border-radius: 16px; }
