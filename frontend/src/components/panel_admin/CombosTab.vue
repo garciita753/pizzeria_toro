@@ -166,12 +166,13 @@
 import { ref, computed, onMounted } from 'vue'
 import { useStoreCombos } from '@/stores/combos/combo_store'
 import type { Combo }     from '@/services/combo_service'
+import {REGEX, useValidacion} from'@/composables/useValidacion'
 import AddCombo from '@/components/panel_admin/add_combo.vue'
 import PutCombo from '@/components/panel_admin/put_combo.vue'
 
 
 const combosStore = useStoreCombos()
-
+const {errors, touched, validarCampo, validarPrecio, campoConError, campoValido, resetValidacion} =useValidacion()
 
 const comboSearch     = ref('')
 const estadoFilter    = ref('')

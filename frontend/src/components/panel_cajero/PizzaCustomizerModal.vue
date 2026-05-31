@@ -170,7 +170,9 @@ const seleccionarTamano = (tamanoId: number) => {
 
 
 const tamanosDeLaPizza = computed(() =>
-  props.pizza ? productosStore.tamanos_producto : []
+  props.pizza
+    ? [...productosStore.tamanos_producto].sort((a, b) => a.precio - b.precio)
+    : []
 )
 
 const tamanoSeleccionado = computed(() =>

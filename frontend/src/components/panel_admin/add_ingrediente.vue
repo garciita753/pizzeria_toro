@@ -60,7 +60,7 @@
               type="text"
               v-model="form.precio_extra"
               placeholder="0.00"
-              @input="validarCampo('precio_extra', String(form.precio_extra))"
+              @input="validarPrecio('precio_extra', String(form.precio_extra))"
             />
             <span v-if="touched.precio_extra" class="input-icon-prefix">
               <i class="fas"
@@ -102,7 +102,13 @@
                 <span class="tamano-icon">{{ tamano.emoji }}</span>
                 <span class="tamano-label">{{ tamano.nombre }}</span>
               </div>
-              <div class="input-prefix small">
+              <div
+                class="input-prefix small"
+                :class="{
+                  'prefix-error': campoConError(`tamano_${tamano.id}`),
+                  'prefix-valid': campoValido(`tamano_${tamano.id}`, form.preciosTamano[tamano.id] ?? 0)
+                }"
+              >
                 <span class="prefix">Bs</span>
                 <input
                   type="number"
@@ -110,8 +116,19 @@
                   step="0.01"
                   min="0"
                   placeholder="0.00"
+                  @input="validarTamanoPrecio(tamano.id)"
                 />
+                <span v-if="touched[`tamano_${tamano.id}`]" class="input-icon-prefix">
+                  <i class="fas"
+                    :class="!errors[`tamano_${tamano.id}`] ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
+                  ></i>
+                </span>
               </div>
+              <transition name="fade">
+                <span v-if="errors[`tamano_${tamano.id}`]" class="field-error">
+                  <i class="fas fa-exclamation-triangle"></i> {{ errors[`tamano_${tamano.id}`] }}
+                </span>
+              </transition>
             </div>
           </div>
 
@@ -172,7 +189,7 @@ const emit  = defineEmits<{ close: [] }>()
 
 const ingredientesStore = useStoreIngredientes()
 
-const { errors, touched, validarCampo, campoConError, campoValido, resetValidacion } = useValidacion()
+const { errors, touched, validarPrecio, validarCampo, validarLista, campoConError, campoValido, resetValidacion } = useValidacion()
 
 const TAMANOS = [
   { id: 1, nombre: 'Pequeña',  emoji: '🍕' },
@@ -199,13 +216,34 @@ const tamañosConfigurados = computed(() =>
 const formularioValido = computed(() => {
   const nombreOk = REGEX.nombre.test(form.value.nombre.trim())
   const precioOk = REGEX.precio_extra.test(String(form.value.precio_extra).trim()) &&
-                   Number(form.value.precio_extra) >= 0
+                  Number(form.value.precio_extra) >= 0
   const sinErrores = Object.values(errors.value).every(e => !e)
   return nombreOk && precioOk && sinErrores
 })
 
 function limpiarTamanos() {
   form.value.preciosTamano = { 1: 0, 2: 0, 3: 0, 4: 0 }
+}
+
+function validarTamanoPrecio(tamanoId: number) {
+  const campo = `tamano_${tamanoId}`
+  const precio = form.value.preciosTamano[tamanoId] ?? 0
+  validarPrecio(campo, precio, 500, false)
+  validarTamanos()
+}
+
+function validarTamanos() {
+  let valido = false
+
+  for (const tamano of TAMANOS) {
+    const campo = `tamano_${tamano.id}`
+    const precio = form.value.preciosTamano[tamano.id] ?? 0
+
+    validarPrecio(campo, precio, 500, false)
+    if (Number(precio) > 0) valido = true
+  }
+
+  return validarLista('tamanos', valido ? ['ok'] : [], 'Ingresa el precio de al menos un tamaño.')
 }
 
 watch(() => props.show, (visible) => {

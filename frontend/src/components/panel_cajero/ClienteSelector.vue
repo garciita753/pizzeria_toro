@@ -118,20 +118,20 @@
                   v-model="form.nombre"
                   placeholder="Ej: Adalid Garcia"
                   :class="{
-                    'input-error': errores.nombre,
-                    'input-valid': form.nombre && !errores.nombre
+                    'input-error': errors.nombre,
+                    'input-valid': form.nombre && !errors.nombre
                   }"
-                  @input="validarCampo('nombre')"
+                  @input="validarCampo('nombre', form.nombre)"
                 />
                 <span v-if="form.nombre" class="input-icon">
                   <i class="fas"
-                    :class="!errores.nombre ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
+                    :class="!errors.nombre ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
                   ></i>
                 </span>
               </div>
               <transition name="fade">
-                <span v-if="errores.nombre" class="field-error">
-                  <i class="fas fa-exclamation-triangle"></i> {{ errores.nombre }}
+                <span v-if="errors.nombre" class="field-error">
+                  <i class="fas fa-exclamation-triangle"></i> {{ errors.nombre }}
                 </span>
               </transition>
             </div>
@@ -147,20 +147,20 @@
                     v-model="form.telefono"
                     placeholder="Ej: 76543210"
                     :class="{
-                      'input-error': errores.telefono,
-                      'input-valid': form.telefono && !errores.telefono
+                      'input-error': errors.telefono,
+                      'input-valid': form.telefono && !errors.telefono
                     }"
-                    @input="validarCampo('telefono')"
+                    @input="validarCampo('telefono', form.telefono ?? '', false)"
                   />
                   <span v-if="form.telefono" class="input-icon">
                     <i class="fas"
-                      :class="!errores.telefono ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
+                      :class="!errors.telefono ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
                     ></i>
                   </span>
                 </div>
                 <transition name="fade">
-                  <span v-if="errores.telefono" class="field-error">
-                    <i class="fas fa-exclamation-triangle"></i> {{ errores.telefono }}
+                  <span v-if="errors.telefono" class="field-error">
+                    <i class="fas fa-exclamation-triangle"></i> {{ errors.telefono }}
                   </span>
                 </transition>
               </div>
@@ -174,20 +174,20 @@
                     v-model="form.nit"
                     placeholder="Ej: 12345671"
                     :class="{
-                      'input-error': errores.nit,
-                      'input-valid': form.nit && !errores.nit
+                      'input-error': errors.nit,
+                      'input-valid': form.nit && !errors.nit
                     }"
-                    @input="validarCampo('nit')"
+                    @input="validarCampo('nit', form.nit ?? '')"
                   />
                   <span v-if="form.nit" class="input-icon">
                     <i class="fas"
-                      :class="!errores.nit ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
+                      :class="!errors.nit ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
                     ></i>
                   </span>
                 </div>
                 <transition name="fade">
-                  <span v-if="errores.nit" class="field-error">
-                    <i class="fas fa-exclamation-triangle"></i> {{ errores.nit }}
+                  <span v-if="errors.nit" class="field-error">
+                    <i class="fas fa-exclamation-triangle"></i> {{ errors.nit }}
                   </span>
                 </transition>
               </div>
@@ -203,20 +203,20 @@
                   v-model="form.correo"
                   placeholder="adalid@email.com"
                   :class="{
-                    'input-error': errores.correo,
-                    'input-valid': form.correo && !errores.correo
+                    'input-error': errors.correo,
+                    'input-valid': form.correo && !errors.correo
                   }"
-                  @input="validarCampo('correo')"
+                  @input="validarCampo('correo', form.correo ?? '', false)"
                 />
                 <span v-if="form.correo" class="input-icon">
                   <i class="fas"
-                    :class="!errores.correo ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
+                    :class="!errors.correo ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
                   ></i>
                 </span>
               </div>
               <transition name="fade">
-                <span v-if="errores.correo" class="field-error">
-                  <i class="fas fa-exclamation-triangle"></i> {{ errores.correo }}
+                <span v-if="errors.correo" class="field-error">
+                  <i class="fas fa-exclamation-triangle"></i> {{ errors.correo }}
                 </span>
               </transition>
             </div>
@@ -230,20 +230,20 @@
                   v-model="form.direccion"
                   placeholder="Dirección completa"
                   :class="{
-                    'input-error': errores.direccion,
-                    'input-valid': form.direccion && !errores.direccion
+                    'input-error': errors.direccion,
+                    'input-valid': form.direccion && !errors.direccion
                   }"
-                  @input="validarCampo('direccion')"
+                  @input="validarCampo('direccion', form.direccion ?? '', false)"
                 />
                 <span v-if="form.direccion" class="input-icon">
                   <i class="fas"
-                    :class="!errores.direccion ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
+                    :class="!errors.direccion ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
                   ></i>
                 </span>
               </div>
               <transition name="fade">
-                <span v-if="errores.direccion" class="field-error">
-                  <i class="fas fa-exclamation-triangle"></i> {{ errores.direccion }}
+                <span v-if="errors.direccion" class="field-error">
+                  <i class="fas fa-exclamation-triangle"></i> {{ errors.direccion }}
                 </span>
               </transition>
             </div>
@@ -281,6 +281,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useStoreClientes } from '@/stores/clientes/clientes'
+import { useValidacion, REGEX } from '@/composables/useValidacion'
 import type { Cliente, ClientePayload } from '@/services/cliente_service'
 
 const store = useStoreClientes()
@@ -301,65 +302,21 @@ const form = ref<ClientePayload>({
   nombre: '', telefono: '', direccion: '', correo: '', nit: ''
 })
 
-
-const REGEX = {
-  
-  nombre:   /^[a-zA-ZÀ-ÿ\s.]{3,}$/,
-  
-  telefono: /^\d{7,8}$/,
-  
-  nit:      /^\d{5,12}$/,
-  
-  correo:   /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  
-  direccion: /^.{5,}$/,
-}
-
-
-const errores = ref<Record<string, string>>({
-  nombre: '', telefono: '', nit: '', correo: '', direccion: ''
-})
-
-
-const validarCampo = (campo: keyof typeof REGEX) => {
-  const valor = (form.value as any)[campo]?.trim() ?? ''
-
-  
-  const esOpcional = campo !== 'nombre' && campo !== 'nit'
-  if (esOpcional && !valor) {
-    errores.value[campo] = ''
-    return
-  }
-
-  
-  if ((campo === 'nombre' || campo === 'nit') && !valor) {
-    const obligatorios: Record<string, string> = {
-      nombre: 'El nombre es obligatorio.',
-      nit:    'El NIT es obligatorio.',
-    }
-    errores.value[campo] = obligatorios[campo]
-    return
-  }
-
-  const mensajes: Record<string, string> = {
-    nombre:   'Mín. 3 letras. Sin números ni caracteres especiales.',
-    telefono: 'Debe tener 7 u 8 dígitos numéricos.',
-    nit:      'Debe tener entre 5 y 12 dígitos numéricos.',
-    correo:   'Formato inválido. Ej: usuario@correo.com',
-    direccion:'Mín. 5 caracteres.',
-  }
-
-  errores.value[campo] = REGEX[campo].test(valor) ? '' : mensajes[campo]
-}
-
+const {
+  errors,
+  touched,
+  validarCampo,
+  campoConError,
+  campoValido,
+  resetValidacion,
+} = useValidacion()
 
 const formularioValido = computed(() => {
-  const camposConError = Object.values(errores.value).some(e => e !== '')
+  const camposConError = Object.values(errors.value).some(e => e !== '')
   const nombreOk = REGEX.nombre.test(form.value.nombre?.trim() ?? '')
   const nitOk    = REGEX.nit.test(form.value.nit?.trim() ?? '')
   return nombreOk && nitOk && !camposConError
 })
-
 
 const resultados = computed<Cliente[]>(() =>
   busqueda.value.length === 0 ? [] : store.buscarPorNombre(busqueda.value)
@@ -381,7 +338,7 @@ function cerrarModal() {
 
 function resetForm() {
   form.value   = { nombre: '', telefono: '', direccion: '', correo: '', nit: '' }
-  errores.value = { nombre: '', telefono: '', nit: '', correo: '', direccion: '' }
+  resetValidacion()
 }
 
 function seleccionarCliente(cliente: Cliente) {
@@ -391,16 +348,21 @@ function seleccionarCliente(cliente: Cliente) {
 
 function seleccionarConsumidorFinal() {
   emit('update:clienteSeleccionado', {
-    id: 0, nombre: 'CONSUMIDOR FINAL',
-    telefono: '0', direccion: '-',
+    id: 11, nombre: 'Consumidor Final',
+    telefono: '', direccion: '',
     activo: true, created_at: '', updated_at: ''
   })
   cerrarModal()
 }
 
 async function crearCliente() {
-  
-  ;(Object.keys(REGEX) as Array<keyof typeof REGEX>).forEach(validarCampo)
+  const campos: Array<keyof typeof REGEX> = ['nombre', 'telefono', 'nit', 'correo', 'direccion']
+  campos.forEach(campo => {
+    const valor = String((form.value as any)[campo] ?? '')
+    const requerido = campo === 'nombre' || campo === 'nit'
+    validarCampo(campo, valor, requerido)
+  })
+
   if (!formularioValido.value) return
 
   const nuevo = await store.agregarCliente(form.value)

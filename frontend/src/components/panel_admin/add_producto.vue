@@ -61,7 +61,7 @@
             <option value="" disabled>Seleccionar categoría...</option>
             <option value="pizzas">🍕 Pizzas</option>
             <option value="bebidas">🥤 Bebidas</option>
-            <option value="pastas">🍝 Pastas</option>
+            <option value="pastas">🍝 Hamburguesas</option>
           </select>
           <transition name="fade">
             <span v-if="errors.categoria" class="field-error">
@@ -79,8 +79,10 @@
             class="input-prefix"
             :class="{
               'prefix-error': campoConError('price'),
-              'prefix-valid': touched.price && !errors.price && Number(form.price) > 0
+              'prefix-valid': touched.price && !errors.price && Number(form.price) > 0 && Number(form.price) <1000
             }"
+
+
           >
             <span class="prefix">Bs</span>
             <input
@@ -127,7 +129,13 @@
                   <span class="tamano-icon">{{ tamano.emoji }}</span>
                   <span class="tamano-label">{{ tamano.nombre }}</span>
                 </div>
-                <div class="input-prefix small">
+                <div
+                  class="input-prefix small"
+                  :class="{
+                    'prefix-error': campoConError(`tamano_${tamano.id}`),
+                    'prefix-valid': campoValido(`tamano_${tamano.id}`, form.preciosTamano[tamano.id])
+                  }"
+                >
                   <span class="prefix">Bs</span>
                   <input
                     type="number"
@@ -135,9 +143,19 @@
                     step="0.01"
                     min="0"
                     placeholder="0.00"
-                    @input="validarTamanos()"
+                    @input="validarPrecio(`tamano_${tamano.id}`, form.preciosTamano[tamano.id], 500, false); validarTamanos()"
                   />
+                  <span v-if="touched[`tamano_${tamano.id}`]" class="input-icon-prefix">
+                    <i class="fas"
+                      :class="!errors[`tamano_${tamano.id}`] ? 'fa-check-circle icon-ok' : 'fa-times-circle icon-err'"
+                    ></i>
+                  </span>
                 </div>
+                <transition name="fade">
+                  <span v-if="errors[`tamano_${tamano.id}`]" class="field-error">
+                    <i class="fas fa-exclamation-triangle"></i> {{ errors[`tamano_${tamano.id}`] }}
+                  </span>
+                </transition>
               </div>
             </div>
             <transition name="fade">
@@ -353,8 +371,17 @@ function toggleIngrediente(id: number) {
 }
 
 function validarTamanos() {
-  const lista = TAMANOS.filter(t => Number(form.value.preciosTamano[t.id]) > 0)
-  validarLista('tamanos', lista, 'Ingresa el precio de al menos un tamaño.')
+  let valido = false
+
+  for (const tamano of TAMANOS) {
+    const campo = `tamano_${tamano.id}`
+    const precio = form.value.preciosTamano[tamano.id]
+
+    validarPrecio(campo, precio, 500, false)
+    if (Number(precio) > 0) valido = true
+  }
+
+  return validarLista('tamanos', valido ? ['ok'] : [], 'Ingresa el precio de al menos un tamaño.')
 }
 
 watch(esPizza, async (val) => {
