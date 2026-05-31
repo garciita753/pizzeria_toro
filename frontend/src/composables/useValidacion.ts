@@ -6,8 +6,11 @@ export const REGEX = {
   nombre_combo: /^[a-zA-ZÀ-ÿ0-9\s.,'"\-]{3,30}$/,
   correo:       /^[^\s@]+@[^\s@]+\.[a-zA-ZÀ-ÿ]{2,10}$/,
   cedula:       /^\d{6,12}$/,
+  telefono:     /^\d{7,8}$/,
+  nit:          /^\d{5,12}$/,
+  direccion:    /^.{5,}$/,
   precio_extra: /^\d+(\.\d{1,2})?$/,
-  precio:       /^\d+(\.\d{1,2})?$/,             
+  precio:       /^\d+(\.\d{1,2})?$/,
   categoria:    /^[a-zA-ZÀ-ÿ0-9_\-]{2,}$/,
   contra:       /^.{6,}$/,
   codigo:       /^[a-zA-Z0-9\-]{2,20}$/,
@@ -31,6 +34,18 @@ const MENSAJES: Record<CampoValidable, { obligatorio: string; invalido: string }
   cedula: {
     obligatorio: 'La cédula es obligatoria.',
     invalido:    'Solo números. Entre 6 y 12 dígitos.',
+  },
+  telefono: {
+    obligatorio: 'El teléfono es obligatorio.',
+    invalido:    'Debe tener 7 u 8 dígitos numéricos.',
+  },
+  nit: {
+    obligatorio: 'El NIT es obligatorio.',
+    invalido:    'Debe tener entre 5 y 12 dígitos numéricos.',
+  },
+  direccion: {
+    obligatorio: 'La dirección es obligatoria.',
+    invalido:    'La dirección debe tener al menos 5 caracteres.',
   },
   precio_extra: {
     obligatorio: 'El precio extra es obligatorio.',
@@ -66,12 +81,12 @@ export function useValidacion() {
    * @param valor   - valor actual como string
    * @returns       - true si el campo es válido
    */
-  function validarCampo(campo: CampoValidable, valor: string): boolean {
+  function validarCampo(campo: CampoValidable, valor: string, required = true): boolean {
     touched.value[campo] = true
     const trimmed = valor.trim()
 
     if (!trimmed) {
-      if (OPCIONALES.includes(campo)) {
+      if (!required || OPCIONALES.includes(campo)) {
         errors.value[campo] = ''
         return true
       }
@@ -123,14 +138,20 @@ export function useValidacion() {
    * Indica si un campo tiene error y ya fue tocado (para mostrar ícono).
    */
   function campoConError(campo: string): boolean {
-    return touched.value[campo] && !!errors.value[campo]
+    return !!touched.value[campo] && !!errors.value[campo]
   }
 
   /**
    * Indica si un campo es válido y ya fue tocado (para mostrar ícono verde).
    */
-  function campoValido(campo: string, valor: string): boolean {
-    return touched.value[campo] && !!valor.trim() && !errors.value[campo]
+  function campoValido(campo: string, valor: string | number): boolean {
+    if (typeof valor === 'string') {
+      return !!touched.value[campo] && !!valor.trim() && !errors.value[campo]
+    }
+    // Para campos numéricos (ej. price) consideramos válido cuando fue tocado,
+    // es un número y no tiene error registrado.
+    const n = Number(valor)
+    return !!touched.value[campo] && !isNaN(n) && !errors.value[campo] && n > 0
   }
 
   /**
@@ -140,17 +161,44 @@ export function useValidacion() {
    * @param valor  - valor numérico
    * @returns      - true si es válido
    */
-  function validarPrecio(campo: string, valor: number | string): boolean {
+  function validarPrecio(
+    campo: string,
+    valor: number | string,
+    max = 1000,
+    required = true,
+  ): boolean {
     touched.value[campo] = true
     const n = Number(valor)
+
     if (!valor && valor !== 0) {
-      errors.value[campo] = 'El precio es obligatorio.'
+      if (required) {
+        errors.value[campo] = 'El precio es obligatorio.'
+        return false
+      }
+      errors.value[campo] = ''
+      return true
+    }
+
+    if (isNaN(n)) {
+      errors.value[campo] = 'El precio no es válido.'
       return false
     }
-    if (isNaN(n) || n <= 0) {
+
+    if (n < 0) {
+      errors.value[campo] = 'El precio no puede ser negativo.'
+      return false
+    }
+
+    if (required && n === 0) {
       errors.value[campo] = 'El precio debe ser mayor a 0.'
       return false
     }
+
+    if (n >= max) {
+      errors.value[campo] = `El precio debe ser menor a ${max}.`
+      return false
+    }
+
     errors.value[campo] = ''
     return true
   }
